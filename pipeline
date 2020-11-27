@@ -1,0 +1,38 @@
+node {
+   def registryProjet='testrestAPI'
+   def IMAGE="mehdi10003/rest-api-test:version-${env.BUILD_ID}"
+    
+   
+
+
+    stage('Build - Clone') {
+         
+          git 'https://github.com/Webdev10003/rest_api_project.git'
+    }
+
+    stage('Build - Maven package'){
+           dir('./Downloads/gs-rest-service-master/complete'){
+            sh 'pwd'
+            sh 'mvn clean ; mvn package'
+           }
+    }
+    
+        def img = stage('Build Docker') {
+        dir('./Downloads/gs-rest-service-master/complete'){
+            sh 'pwd'
+          docker.build("$IMAGE",  '.')
+        }
+        
+        
+            stage('Push docker image') {
+            docker.withRegistry('https://registry-1.docker.io/v2/', 'mehdi10003'){
+            docker.image("$IMAGE").push 'latest'
+            docker.image("$IMAGE").push()
+    }
+          }
+
+        
+        
+    }
+
+}
